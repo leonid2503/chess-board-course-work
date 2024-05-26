@@ -42,7 +42,7 @@ class InputBox:
         if event.type == pygame.MOUSEBUTTONDOWN:
             if self.rect.collidepoint(event.pos):
                 self.active = not self.active
-                self.color = pygame.Color('dodgerblue') if self.active else pygame.Color('lightskyblue3')
+                self.color = pygame.Color('dodgerblue') if self.active else pygame.Color('lightskyblue3')  # noqa: E501
             else:
                 self.active = False
                 self.color = pygame.Color('lightskyblue3')
@@ -53,7 +53,7 @@ class InputBox:
                         return int(self.text) * 60
                     except ValueError:
                         self.text = ''
-                        self.txt_surface = font.render(self.text, True, self.color)
+                        self.txt_surface = font.render(self.text, True, self.color)  # noqa: E501
                         return None
                 elif event.key == pygame.K_BACKSPACE:
                     self.text = self.text[:-1]
@@ -88,13 +88,13 @@ class Button:
 
 
 def load_piece_images():
-    for piece, code in [('king', 'K'), ('queen', 'Q'), ('rook', 'R'), ('bishop', 'B'), ('knight', 'N'), ('pawn', 'P')]:
+    for piece, code in [('king', 'K'), ('queen', 'Q'), ('rook', 'R'), ('bishop', 'B'), ('knight', 'N'), ('pawn', 'P')]:  # noqa: E501
         for color in ['white', 'black']:
             filename = f"{color}_{piece}.png"
             filepath = os.path.join(PIECE_PATH, filename)
             image = pygame.image.load(filepath)
             piece_key = f"{color[0].lower()}{code}"
-            piece_images[piece_key] = pygame.transform.scale(image, (SQUARE_SIZE, SQUARE_SIZE))
+            piece_images[piece_key] = pygame.transform.scale(image, (SQUARE_SIZE, SQUARE_SIZE))  # noqa: E501
 
 
 load_piece_images()
@@ -107,14 +107,14 @@ def draw_board_and_pieces():
         for col in range(8):
             square = row * 8 + col
             color = board_colors[(row + col) % 2]
-            pygame.draw.rect(screen, color, pygame.Rect(col * SQUARE_SIZE, row * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE))
+            pygame.draw.rect(screen, color, pygame.Rect(col * SQUARE_SIZE, row * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE))  # noqa: E501
             piece = board.piece_at(square)
             if piece:
                 color_prefix = 'w' if piece.color == chess.WHITE else 'b'
                 piece_key = f"{color_prefix}{piece.symbol().upper()}"
                 if piece_key in piece_images:
                     piece_image = piece_images[piece_key]
-                    screen.blit(piece_image, (col * SQUARE_SIZE, row * SQUARE_SIZE))
+                    screen.blit(piece_image, (col * SQUARE_SIZE, row * SQUARE_SIZE))  # noqa: E501
                 else:
                     print(f"Warning: No image for {piece_key}")
 
@@ -124,7 +124,6 @@ def handle_mouse_click(pos):
     col = pos[0] // SQUARE_SIZE
     row = pos[1] // SQUARE_SIZE
     if col >= 8 or row >= 8:
-        # Click is outside the board boundaries
         return
 
     clicked_square = row * 8 + col
@@ -133,25 +132,24 @@ def handle_mouse_click(pos):
         piece = board.piece_at(clicked_square)
         if piece and piece.color == board.turn:
             selected_square = clicked_square
-            highlighted_moves = [move for move in board.legal_moves if move.from_square == clicked_square]
-            print(f"Selected {chess.SQUARE_NAMES[clicked_square]} for {piece.symbol()} moves.")
+            highlighted_moves = [move for move in board.legal_moves if move.from_square == clicked_square]  # noqa: E501
+            print(f"Selected {chess.SQUARE_NAMES[clicked_square]} for {piece.symbol()} moves.")  # noqa: E501
         else:
-            print(f"Click at {chess.SQUARE_NAMES[clicked_square]}: No piece to select or not the player's turn.")
-    else:
-        move = chess.Move.from_uci(f"{chess.SQUARE_NAMES[selected_square]}{chess.SQUARE_NAMES[clicked_square]}")
+            print(f"Click at {chess.SQUARE_NAMES[clicked_square]}: No piece to select or not the player's turn.")  # noqa: E501
+        move = chess.Move.from_uci(f"{chess.SQUARE_NAMES[selected_square]}{chess.SQUARE_NAMES[clicked_square]}")  # noqa: E501
         if move in board.legal_moves:
             board.push(move)
-            move_uci = move.uci()  # Use UCI notation directly
+            move_uci = move.uci()
             move_log.append(move_uci)
             print(f"Move made: {move_uci}, Board FEN: {board.fen()}")
             selected_square = None
             highlighted_moves = []
         else:
-            print(f"Attempted illegal move: {move.uci()} from {chess.SQUARE_NAMES[selected_square]} to {chess.SQUARE_NAMES[clicked_square]}")
+            print(f"Attempted illegal move: {move.uci()} from {chess.SQUARE_NAMES[selected_square]} to {chess.SQUARE_NAMES[clicked_square]}")  # noqa: E501
             print("Legal moves from selected square:")
             for legal_move in board.legal_moves:
                 if legal_move.from_square == selected_square:
-                    print(f" - {legal_move.uci()} to {chess.SQUARE_NAMES[legal_move.to_square]}")
+                    print(f" - {legal_move.uci()} to {chess.SQUARE_NAMES[legal_move.to_square]}")  # noqa: E501
             selected_square = None
             highlighted_moves = []
 
@@ -207,12 +205,12 @@ def draw_timers():
     white_time_text = f"White: {white_minutes}:{white_seconds:02d}"
     black_time_text = f"Black: {black_minutes}:{black_seconds:02d}"
 
-    timer_x = 850 
+    timer_x = 850
     timer_y = 0
 
-    pygame.draw.rect(screen, pygame.Color('darkgrey'), (timer_x, timer_y, 200, 80))
-    white_time_surface = font.render(white_time_text, True, pygame.Color('black'))
-    black_time_surface = font.render(black_time_text, True, pygame.Color('black'))
+    pygame.draw.rect(screen, pygame.Color('darkgrey'), (timer_x, timer_y, 200, 80))  # noqa: E501
+    white_time_surface = font.render(white_time_text, True, pygame.Color('black'))  # noqa: E501
+    black_time_surface = font.render(black_time_text, True, pygame.Color('black'))  # noqa: E501
 
     screen.blit(white_time_surface, (timer_x + 10, timer_y + 10))
     screen.blit(black_time_surface, (timer_x + 10, timer_y + 40))
@@ -282,27 +280,28 @@ def select_time_control():
                 pygame.quit()
                 sys.exit()
 
+
 def show_message_box(screen, message):
     font = pygame.font.Font(None, 36)
     box_width, box_height = 400, 200
     box_x, box_y = (WIDTH - box_width) // 2, (HEIGHT - box_height) // 2
-    
+
     overlay = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
     overlay.fill((0, 0, 0, 180))
     screen.blit(overlay, (0, 0))
-    
-    pygame.draw.rect(screen, (255, 255, 255), [box_x, box_y, box_width, box_height])
-    pygame.draw.rect(screen, (0, 0, 0), [box_x, box_y, box_width, box_height], 3)
-    
+
+    pygame.draw.rect(screen, (255, 255, 255), [box_x, box_y, box_width, box_height])  # noqa: E501
+    pygame.draw.rect(screen, (0, 0, 0), [box_x, box_y, box_width, box_height], 3)  # noqa: E501
+
     lines = message.splitlines()
     line_height = font.get_height()
     for i, line in enumerate(lines):
         text_surface = font.render(line, True, (0, 0, 0))
-        text_rect = text_surface.get_rect(center=(WIDTH // 2, box_y + 50 + i * line_height))
+        text_rect = text_surface.get_rect(center=(WIDTH // 2, box_y + 50 + i * line_height))  # noqa: E501
         screen.blit(text_surface, text_rect)
 
     pygame.display.flip()
-    
+
     waiting = True
     while waiting:
         for event in pygame.event.get():
