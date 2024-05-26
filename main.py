@@ -136,22 +136,30 @@ def handle_mouse_click(pos):
             print(f"Selected {chess.SQUARE_NAMES[clicked_square]} for {piece.symbol()} moves.")  # noqa: E501
         else:
             print(f"Click at {chess.SQUARE_NAMES[clicked_square]}: No piece to select or not the player's turn.")  # noqa: E501
-        move = chess.Move.from_uci(f"{chess.SQUARE_NAMES[selected_square]}{chess.SQUARE_NAMES[clicked_square]}")  # noqa: E501
-        if move in board.legal_moves:
-            board.push(move)
-            move_uci = move.uci()
-            move_log.append(move_uci)
-            print(f"Move made: {move_uci}, Board FEN: {board.fen()}")
+    else:
+        if selected_square == clicked_square:
             selected_square = None
             highlighted_moves = []
+            print(f"Deselected {chess.SQUARE_NAMES[clicked_square]}")
         else:
-            print(f"Attempted illegal move: {move.uci()} from {chess.SQUARE_NAMES[selected_square]} to {chess.SQUARE_NAMES[clicked_square]}")  # noqa: E501
-            print("Legal moves from selected square:")
-            for legal_move in board.legal_moves:
-                if legal_move.from_square == selected_square:
-                    print(f" - {legal_move.uci()} to {chess.SQUARE_NAMES[legal_move.to_square]}")  # noqa: E501
-            selected_square = None
-            highlighted_moves = []
+            move = chess.Move.from_uci(f"{chess.SQUARE_NAMES[selected_square]}{chess.SQUARE_NAMES[clicked_square]}")  # noqa: E501
+            if move in board.legal_moves:
+                board.push(move)
+                try:
+                    move_uci = move.uci()
+                    move_log.append(move_uci)
+                    print(f"Move made: {move_uci}, Board FEN: {board.fen()}")
+                except AssertionError as e:
+                    print(f"Error: {str(e)} - This error should not occur since the move was validated as legal.")  # noqa: E501
+                selected_square = None
+                highlighted_moves = []
+            else:
+                print(f"Illegal move attempted: {move.uci()} from {chess.SQUARE_NAMES[selected_square]} to {chess.SQUARE_NAMES[clicked_square]}")  # noqa: E501
+                for legal_move in board.legal_moves:
+                    if legal_move.from_square == selected_square:
+                        print(f" - {legal_move.uci()} to {chess.SQUARE_NAMES[legal_move.to_square]}")  # noqa: E501
+                selected_square = None
+                highlighted_moves = []
 
 
 def draw_move_log():
