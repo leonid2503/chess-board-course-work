@@ -282,6 +282,54 @@ def select_time_control():
                 pygame.quit()
                 sys.exit()
 
+def show_message_box(screen, message):
+    font = pygame.font.Font(None, 36)
+    box_width, box_height = 400, 200
+    box_x, box_y = (WIDTH - box_width) // 2, (HEIGHT - box_height) // 2
+    
+    overlay = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
+    overlay.fill((0, 0, 0, 180))
+    screen.blit(overlay, (0, 0))
+    
+    pygame.draw.rect(screen, (255, 255, 255), [box_x, box_y, box_width, box_height])
+    pygame.draw.rect(screen, (0, 0, 0), [box_x, box_y, box_width, box_height], 3)
+    
+    lines = message.splitlines()
+    line_height = font.get_height()
+    for i, line in enumerate(lines):
+        text_surface = font.render(line, True, (0, 0, 0))
+        text_rect = text_surface.get_rect(center=(WIDTH // 2, box_y + 50 + i * line_height))
+        screen.blit(text_surface, text_rect)
+
+    pygame.display.flip()
+    
+    waiting = True
+    while waiting:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                waiting = False
+
+
+def game_over(message):
+    show_message_box(screen, message)
+    pygame.quit()
+    sys.exit()
+
+
+def check_game_end():
+    if board.is_checkmate():
+        winning_color = "White" if board.turn == chess.BLACK else "Black"
+        game_over(f"Checkmate. {winning_color} wins!")
+    elif board.is_stalemate() or board.is_insufficient_material():
+        game_over("Stalemate or insufficient material. The game is a draw.")
+    elif white_time <= 0:
+        game_over("Time out. Black wins!")
+    elif black_time <= 0:
+        game_over("Time out. White wins!")
+
 
 def game_loop():
     global white_time, black_time, last_update_time
@@ -303,6 +351,8 @@ def game_loop():
             load_button.handle_event(event)
 
         screen.fill(pygame.Color('white'))
+
+        check_game_end()
 
         draw_board_and_pieces()
         draw_highlights()
